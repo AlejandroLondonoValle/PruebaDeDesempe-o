@@ -1,5 +1,5 @@
 using HotelApiRestFull.Data;
-using HotelApiRestFull.DTOs.Request;
+using HotelApiRestFull.DTOs.Response;
 using HotelApiRestFull.Models;
 using HotelApiRestFull.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -42,8 +42,6 @@ public class BookingServices : IBookingRepository
             throw new Exception("Error al crear la reserva", ex);
         }
     }
-
-
     public async Task<bool> CheckExistence(int id)
     {
         try
@@ -59,7 +57,6 @@ public class BookingServices : IBookingRepository
             throw new Exception("Ocurrió un error inesperado al agregar la reserva.", ex);
         }
     }
-
     public async Task Delete(int id)
     {
         var booking = await _context.Bookings.FindAsync(id);
@@ -70,13 +67,33 @@ public class BookingServices : IBookingRepository
         }
     }
 
-    public Task<Booking?> GetById(int id)
+    public async Task<BookingDTO?> GetById(int id)
     {
-        throw new NotImplementedException();
+        var booking = await _context.Bookings.
+         Include(b => b.Guest).
+         Include(b => b.Employee).
+         Include(b => b.Room.RoomType).
+         FirstOrDefaultAsync(b => b.Id == id);
+
+         if (booking == null)
+         {
+             return null;
+         }
+
+         return new BookingDTO
+         {
+            Id = booking.Id,
+            StartDate = booking.StartDate,
+            EndDate = booking.EndDate,
+            TotalCost = booking.TotalCost,
+            Room = booking.Room,
+            Guest = booking.Guest,
+            Employee = booking.Employee,
+         };
     }
 
-    public Task<Booking?> GetByIdentificationNumber(string identification_number)
+    public async Task<Booking?> GetByIdentificationNumber(string identification_number)
     {
-        throw new NotImplementedException();
+        return await _context.Bookings.FirstOrDefaultAsync(b => b.Guest.IdentificationNumber == identification_number);
     }
 }
