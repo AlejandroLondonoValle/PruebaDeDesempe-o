@@ -2,6 +2,7 @@ using HotelApiRestFull.Data;
 using HotelApiRestFull.DTOs.Request;
 using HotelApiRestFull.Models;
 using HotelApiRestFull.Repositories;
+using Microsoft.EntityFrameworkCore;
 namespace HotelApiRestFull.Services;
 
 public class BookingServices : IBookingRepository
@@ -46,21 +47,26 @@ public class BookingServices : IBookingRepository
     {
         try
         {
-            return await _context.Bookings.AnyAsync(o => o.Id == id);
+            return await _context.Bookings.AnyAsync(b => b.Id == id);
         }
         catch (DbUpdateException dbEx)
         {
-            throw new Exception("Error al agregar la orden a la base de datos.", dbEx);
+            throw new Exception("Error al agregar la reserva a la base de datos.", dbEx);
         }
         catch (Exception ex)
         {
-            throw new Exception("Ocurrió un error inesperado al agregar la orden.", ex);
+            throw new Exception("Ocurrió un error inesperado al agregar la reserva.", ex);
         }
     }
 
-    public Task Delete(int id)
+    public async Task Delete(int id)
     {
-        throw new NotImplementedException();
+        var booking = await _context.Bookings.FindAsync(id);
+        if (booking != null)
+        {
+            _context.Bookings.Remove(booking);
+            await _context.SaveChangesAsync();
+        }
     }
 
     public Task<Booking?> GetById(int id)
