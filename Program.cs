@@ -11,9 +11,9 @@ using HotelApiRestFull.Services;
 using HotelApiRestFull.Seeders;
 
 
+Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
-Env.Load();
 builder.Configuration.AddEnvironmentVariables();
 var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
 var dbPort = Environment.GetEnvironmentVariable("DB_PORT");
@@ -141,3 +141,4 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
