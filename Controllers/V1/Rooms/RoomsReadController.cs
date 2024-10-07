@@ -30,8 +30,6 @@ public partial class RoomsController : ControllerBase
         return Ok(status);
     }
 
-
-
     [Authorize]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Room>>> GetAll()
